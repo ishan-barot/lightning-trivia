@@ -3,6 +3,7 @@ package main
 import (
     "log"
     "net/http"
+    "os"
 
     "github.com/gorilla/websocket"
 )
@@ -14,18 +15,19 @@ var upgrader = websocket.Upgrader{
 }
 
 func main() {
-    // simple route for WebSocket
+    port := os.Getenv("PORT")
+    if port == "" {
+        port = "8080"
+    }
+
     http.HandleFunc("/ws", handleConnections)
 
-    // start server on port 8080
-    log.Println("Server started on :8080")
-    if err := http.ListenAndServe(":8080", nil); err != nil {
+    log.Println("Server starting on :" + port)
+    if err := http.ListenAndServe(":"+port, nil); err != nil {
         log.Fatal("ListenAndServe: ", err)
     }
 }
 
-// handleConnections upgrades the HTTP request to a WebSocket and
-// adds the player to a game room, etc.
 func handleConnections(w http.ResponseWriter, r *http.Request) {
     conn, err := upgrader.Upgrade(w, r, nil)
     if err != nil {
@@ -34,7 +36,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
     }
     defer conn.Close()
 
-    // for demonstration, just echo messages:
+    // Simple echo loop
     for {
         _, msg, err := conn.ReadMessage()
         if err != nil {
@@ -43,7 +45,6 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
         }
         log.Printf("Received: %s", msg)
 
-        // echo back to client
         err = conn.WriteMessage(websocket.TextMessage, msg)
         if err != nil {
             log.Printf("Write error: %v", err)
