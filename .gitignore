@@ -1,0 +1,17 @@
+# ---> Go related
+bin/
+*.exe
+*.test
+*.out
+
+# ---> Node/React Native/Expo related
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# ---> macOS
+.DS_Store
+
+# ---> Others
+.vscode/
+.idea/
